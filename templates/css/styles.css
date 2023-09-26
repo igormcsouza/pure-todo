@@ -50,6 +50,14 @@
 .red {
   color: red;
 }
+
+.text-sm {
+  font-size: 0.5rem;
+}
+
+.text-md {
+  font-size: 1rem;
+}
   
 /* Responsive layout for small screens */
 @media (max-width: 768px) {

@@ -16,12 +16,12 @@
     <h1>Todo List</h1>
     <!-- Input field to add new todo items -->
     <input type="text" v-model="newTodo" @keyup.enter="addTodo" placeholder="Add a new todo here!">
-    <span class="red">{{inputWarning}}</span>
+    <span class="red text-sm">{{inputWarning}}</span>
 
     <!-- Display the list of todo items -->
     <ul class="custom-ul m-0 p-0">
       <li v-for="(todo, index) in todos" :key="index" class="list-item mt-10">
-        {{ todo }}
+        <span class="text-md">{{ todo }}</span>
         <button @click="removeTodo(index)">Delete</button>
       </li>
     </ul>
