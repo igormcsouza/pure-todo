@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <!-- Include Vue.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+  <link href="static/favicon.ico" rel="icon" type="image/x-icon">
+</head>
+
+<body class="center-top-container mt-10">
+  <div id="app" class="vertical-center">
+    <h1>Todo List</h1>
+    <!-- Input field to add new todo items -->
+    <input type="text" v-model="newTodo" @keyup.enter="addTodo" placeholder="Add a new todo here!">
+    <span class="red">{{inputWarning}}</span>
+
+    <!-- Display the list of todo items -->
+    <ul class="custom-ul m-0 p-0">
+      <li v-for="(todo, index) in todos" :key="index" class="list-item mt-10">
+        {{ todo }}
+        <button @click="removeTodo(index)">Delete</button>
+      </li>
+    </ul>
+  </div>
+
+  <script src="js/index.js"></script>
+</body>
+
+</html>

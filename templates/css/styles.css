@@ -1,0 +1,66 @@
+.center-top-container {
+  display: flex;
+  flex-grow: 1; /* Allow content to grow vertically */
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 90vh; /* 50% of the viewport height */
+  border: 1px solid #000; /* Adds a 1px black border */
+  width: 50%; /* 50% of the viewport width */
+  margin: 0 auto; /* Center horizontally */
+  box-sizing: border-box; /* Include border in width and height calculations */
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.vertical-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.custom-ul {
+  list-style: none; /* Remove list bullets */
+  width: 100%;
+  max-height: 60vh; /* Adjust this value as needed */
+  overflow-y: auto;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.red {
+  color: red;
+}
+  
+/* Responsive layout for small screens */
+@media (max-width: 768px) {
+  .center-top-container {
+    width: 100%; /* Occupy the entire screen width on small screens */
+    border: none; /* Remove the border on small screens */
+    height: auto; /* Reset height to auto */
+    justify-content: center; /* Center vertically */
+  }
+  .vertical-center {
+    width: 70%; /* Occupy the entire screen width on small screens */
+  }
+}
+  
