@@ -1,9 +1,10 @@
-import os
 import json
 import logging
 import argparse
 import socketserver
-from http.server import BaseHTTPRequestHandler
+
+from src.repository import TodoRepository
+from src.app_framework import AppFramework, StatusCode, RequestError
 
 
 logging.basicConfig(
@@ -13,116 +14,82 @@ logging.basicConfig(
 )
 
 
-todos = []
-
-
-class Application(BaseHTTPRequestHandler):
-
-    TEMPLATE_DIR = 'templates'
-    CONTENT_TYPE = {
-        "text": "text/plain"
-    }
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+class Application(AppFramework):
 
     def do_GET(self):
         if self.path == "/":
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
-            self.end_headers()
-
-            with open(os.path.join(self.TEMPLATE_DIR, "index.html"), "rb") as html:
-                self.wfile.write(html.read())
+            self._respond_as_html("index.html")
 
         elif self.path == "/get-todos":
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-
-            self.wfile.write(json.dumps({"todos": todos}).encode('utf-8'))
+            todos = TodoRepository.get_all()
+            self._respond_as_json({"todos": todos})
 
         ## Deals with static files and other paths related to the frontend.
-
-        elif self.path.endswith("favicon.ico"):
-            self.send_response(200)
-            self.send_header('Content-Type', 'image/x-icon')
-            self.end_headers()
-
-            with open(os.path.join(self.TEMPLATE_DIR, "static", "favicon.ico"), "rb") as file:
-                self.wfile.write(file.read())
-
-        elif self.path.startswith("/js"):
-            self.send_response(200)
-            self.send_header("Content-Type", "text/js")
-            self.end_headers()
-
-            with open(os.path.join(self.TEMPLATE_DIR, "js", self.path.removeprefix("/js/")), "rb") as js:
-                self.wfile.write(js.read())
-
-        elif self.path.startswith("/css"):
-            self.send_response(200)
-            self.send_header("Content-Type", "text/css")
-            self.end_headers()
-
-            with open(os.path.join(self.TEMPLATE_DIR, "css", self.path.removeprefix("/css/")), "rb") as css:
-                self.wfile.write(css.read())
+        elif self._serve_static_files():
+            logging.info(f"Served static files at {self.path}")
 
         ## Fallback
 
         else:
-            self.send_response(404)
-            self.send_header("Content-Type", "text/html")
-            self.end_headers()
-            self.wfile.write(b"<h1>404 - Not Found</h1>")
+            self._fallback_404()
 
     def do_POST(self):
-        if self.path == "/add-todo":
-            content_length = int(self.headers['Content-Length'])
-        
-            # Read the POST data from the request
-            post_data = self.rfile.read(content_length)
-            
+        if self.path == "/add-todo":            
             try:
-                # Assuming the POST data is in JSON format
-                data = json.loads(post_data.decode('utf-8'))
+                # Load the request parameters
+                data = self._load_json_request()
+
+                if "todo" not in data:
+                    raise RequestError(
+                        f"There is no todo on the request: {data}")
                 
                 # Process the data
-                todos.append(data["todo"])
+                TodoRepository.create(data["todo"])
                 
                 # Send a response
-                self.send_response(201)
-                self.send_header("Content-type", self.CONTENT_TYPE["text"])
-                self.end_headers()
-                self.wfile.write(bytes("Data received and processed", "utf-8"))
+                self._respond_as_json(
+                    {"response": "Data received and processed"},
+                    StatusCode.CREATED_201
+                )
                 
-            except json.JSONDecodeError as e:
+            except (json.JSONDecodeError, RequestError) as e:
                 logging.error(f"Error parsing json! {e}")
 
                 # Handle JSON parsing errors
-                self.send_response(400)
-                self.send_header("Content-type", self.CONTENT_TYPE["text"])
-                self.end_headers()
-                self.wfile.write(bytes("Invalid JSON data: " + str(e), "utf-8"))
+                self._respond_as_error(
+                    f"Invalid JSON data: {e}", StatusCode.BAD_REQUEST_400)
+
+        ## Fallback
+
+        else:
+            self._fallback_404()
 
     def do_DELETE(self):
         if self.path.startswith("/remove-todo"):
             remove_todo = self.path.split("/")[-1].replace("%20", " ")
 
             try:
-                todos.remove(remove_todo)
+                # Uses the repository to delete the item
+                TodoRepository.delete(remove_todo)
 
-                self.send_response(201)
-                self.send_header('Content-type', self.CONTENT_TYPE["text"])
-                self.end_headers()
-                self.wfile.write(bytes("Data received and processed", "utf-8"))
+                if remove_todo == "":
+                    raise RequestError("There is no todo on the request")
+
+                self._respond_as_json(
+                    {"response": "Data received and processed"},
+                    StatusCode.ACCEPTED_202
+                )
+                
             except ValueError:
                 logging.error(f"There is no todo: {remove_todo}")
 
-                self.send_response(400)
-                self.send_header('Content-type', self.CONTENT_TYPE["text"])
-                self.end_headers()
-                self.wfile.write(bytes(f"Invalid todo: {remove_todo}", "utf-8"))
+                self._respond_as_error(
+                    f"Invalid todo: {remove_todo}", StatusCode.BAD_REQUEST_400)
+
+        ## Fallback
+
+        else:
+            self._fallback_404()
         
 
 if __name__ == "__main__":
