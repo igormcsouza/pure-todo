@@ -16,11 +16,11 @@ class TodoRepository:
     @staticmethod
     def get_all() -> list[str]:
         return todo
-    
+
     @staticmethod
     def get_one(todo_name: str) -> bool:
         return todo_name in todo
-    
+
     @classmethod
     def create(cls, todo_name: str):
         cls._check_instance(todo_name)

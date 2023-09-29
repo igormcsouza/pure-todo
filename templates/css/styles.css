@@ -58,7 +58,7 @@
 .text-md {
   font-size: 1rem;
 }
-  
+
 /* Responsive layout for small screens */
 @media (max-width: 768px) {
   .center-top-container {
@@ -71,4 +71,3 @@
     width: 70%; /* Occupy the entire screen width on small screens */
   }
 }
-  
