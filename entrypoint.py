@@ -34,7 +34,7 @@ class Application(AppFramework):
             self._fallback_404()
 
     def do_POST(self):
-        if self.path == "/add-todo":            
+        if self.path == "/add-todo":
             try:
                 # Load the request parameters
                 data = self._load_json_request()
@@ -42,16 +42,16 @@ class Application(AppFramework):
                 if "todo" not in data:
                     raise RequestError(
                         f"There is no todo on the request: {data}")
-                
+
                 # Process the data
                 TodoRepository.create(data["todo"])
-                
+
                 # Send a response
                 self._respond_as_json(
                     {"response": "Data received and processed"},
                     StatusCode.CREATED_201
                 )
-                
+
             except (json.JSONDecodeError, RequestError) as e:
                 logging.error(f"Error parsing json! {e}")
 
@@ -79,7 +79,7 @@ class Application(AppFramework):
                     {"response": "Data received and processed"},
                     StatusCode.ACCEPTED_202
                 )
-                
+
             except ValueError:
                 logging.error(f"There is no todo: {remove_todo}")
 
@@ -90,11 +90,14 @@ class Application(AppFramework):
 
         else:
             self._fallback_404()
-        
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Serve TODO Application from scratch")
-    parser.add_argument("--port", "-p", help="Set the port to serve the application", default=8000, type=int)
+    parser.add_argument(
+        "--port", "-p", help="Set the port to serve the application",
+        default=8000, type=int
+    )
     args = parser.parse_args()
 
     logging.info(f"Server running at http://localhost:{args.port}")

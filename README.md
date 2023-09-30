@@ -26,3 +26,14 @@ There is another better way to implement it, still with pure python, using the `
 Well, this is not ideal because you must deal with everything, even the pathing to the static files, but with a simple project like this is easy to have fun doing those low-level stuff.
 
 As *App Server* I'm using the `socketserver` library, also a standart for python! Which deals with port and sockets, I thought on working with it too, but I'm too lazy now. Maybe if I have too much fun here I can think on writing my own *App Server*. But, this guy is also no ideal for production, we have uWSGI and Gunicorn that are way better and heavy-tested.
+
+## Pre-commit
+
+[Pre-commit](https://pre-commit.com/) is a fantastic tool to help maintain good quality code before even commit. Unfortunetly this is a package we need to install, but because is for development purpose, I think we are still in a good shape! Let's see what we need to do to start using it on our development environment.
+
+1. Create a virtual environment with `python3 -m venv .venv`. Make sure you have python3-venv installed.
+2. Install the pre-commit with `pip install -r requirements.txt`.
+3. Install the pre-commit on __.git__ using `pre-commit install`.
+4. Now, everytime you make a commit, __pre-commit__ will run against the files you changed!
+
+There are manual ways to add those pre-commits directly to __.git__ with no usage of external package, but let's be honest, we are writting things by hand enough! :D
