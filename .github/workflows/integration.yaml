@@ -1,0 +1,32 @@
+name: Run Precommit and Unit Tests
+
+on:
+    pull_request:
+    push:
+      branches: [main]
+
+jobs:
+    precommit:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Check out the code
+          uses: actions/checkout@v3
+        - name: Set up Python
+          uses: actions/setup-python@v3
+          with:
+            python-version: 3.11
+        - name: Run Precommit
+          uses: pre-commit/action@v3.0.0
+
+    unit-tests:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Check out the code
+          uses: actions/checkout@v3
+        - name: Set up Python
+          uses: actions/setup-python@v3
+          with:
+            python-version: 3.11
+        - name: Run Python Unit Tests
+          run: |
+            python -m unittest discover .
