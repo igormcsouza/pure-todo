@@ -1,4 +1,8 @@
-todo: list[str] = []
+import logging
+
+
+class Singleton:
+    todos: list[str] = []
 
 
 class InsertionException(Exception):
@@ -15,18 +19,22 @@ class TodoRepository:
 
     @staticmethod
     def get_all() -> list[str]:
-        return todo
+        return Singleton.todos
 
     @staticmethod
     def get_one(todo_name: str) -> bool:
-        return todo_name in todo
+        return todo_name in Singleton.todos
 
     @classmethod
     def create(cls, todo_name: str):
         cls._check_instance(todo_name)
-        todo.append(todo_name)
+        Singleton.todos.append(todo_name)
 
     @classmethod
     def delete(cls, todo_name: str):
         cls._check_instance(todo_name)
-        todo.remove(todo_name)
+        try:
+            Singleton.todos.remove(todo_name)
+        except ValueError:
+            logging.warning(f"Could not remove '{todo_name}' because is not "
+                            "currently in the list.")
